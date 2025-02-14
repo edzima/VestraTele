@@ -318,7 +318,7 @@ class SPIApi extends Component
 		}
 	}
 
-	protected function isAuthRequest(Request $request): bool {
+	public function isAuthRequest(Request $request): bool {
 		return strpos($request->getUrl(), '/authenticate') !== false;
 	}
 

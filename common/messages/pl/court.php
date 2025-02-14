@@ -58,6 +58,11 @@ return [
 	'Create Lawsuit for Issues: {issuesCount}' => 'Dodano Rozprawę do Spraw: {issuesCount}',
 	'Not found Issue for User: {user}' => 'Nie znaleziono Spraw dla {user}',
 	'Update Sessions: {count}' => 'Zaktualizowano Posiedzenia: {count}',
-	'Sync Sessions' => 'Synchronizuj Posiedzenia z SPI',
+	'Sync with SPI' => 'Synchronizuj z SPI',
 	'All sessions is already synced.' => 'Wszystkie posiedzenia są aktualne.',
+	'Confirmed User SPI' => 'SPI zatwierdził(a)',
+	'SPI Last Update At' => 'SPI - aktualizacja',
+	'SPI Last Sync At' => 'SPI - synchronizacja',
+	'Changes from SPI to {confirmLink}.' => '{confirmLink} zmiany z SPI',
+	'Confirm' => 'Zatwierdź',
 ];

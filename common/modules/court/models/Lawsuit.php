@@ -25,6 +25,10 @@ use yii\db\Expression;
  * @property string $updated_at
  * @property int $creator_id
  * @property int $is_appeal
+ * @property string|null $result
+ * @property string|null $spi_last_sync_at
+ * @property string|null $spi_last_update_at
+ * @property int $spi_confirmed_user
  *
  * @property Court $court
  * @property User $creator
@@ -67,7 +71,7 @@ class Lawsuit extends ActiveRecord {
 			[['court_id', 'creator_id', 'presence_of_the_claimant'], 'integer'],
 			[['is_appeal', 'boolean']],
 			[['due_at', 'created_at', 'updated_at'], 'safe'],
-			[['signature_act', 'details'], 'string', 'max' => 255],
+			[['signature_act', 'details', 'result'], 'string', 'max' => 255],
 			[['signature_act', 'details'], 'default', 'value' => null],
 			[['court_id'], 'exist', 'skipOnError' => true, 'targetClass' => Court::class, 'targetAttribute' => ['court_id' => 'id']],
 			[['creator_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['creator_id' => 'id']],
@@ -90,6 +94,10 @@ class Lawsuit extends ActiveRecord {
 			'creator_id' => Yii::t('court', 'Creator ID'),
 			'creator' => Yii::t('court', 'Creator'),
 			'is_appeal' => Yii::t('court', 'Is Appeal'),
+			'result' => Yii::t('court', 'Result'),
+			'spi_last_update_at' => Yii::t('court', 'SPI Last Update At'),
+			'spi_last_sync_at' => Yii::t('court', 'SPI Last Sync At'),
+			'spi_is_confirm_update' => Yii::t('court', 'SPI has confirm Update'),
 		];
 	}
 
@@ -113,6 +121,10 @@ class Lawsuit extends ActiveRecord {
 	 */
 	public function getCreator() {
 		return $this->hasOne(User::class, ['id' => 'creator_id']);
+	}
+
+	public function getSpiConfirmedUser() {
+		return $this->hasOne(User::class, ['id' => 'spi_confirmed_user']);
 	}
 
 	public function getSessions(): ActiveQuery {

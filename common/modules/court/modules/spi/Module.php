@@ -10,6 +10,7 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\Module as BaseModule;
 use yii\di\Instance;
+use yii\httpclient\RequestEvent;
 
 class Module extends BaseModule implements AppealInterface {
 
@@ -18,7 +19,7 @@ class Module extends BaseModule implements AppealInterface {
 
 	public $controllerNamespace = 'common\modules\court\modules\spi\controllers';
 
-	public ?string $appeal = null;
+	public string $appeal = AppealInterface::APPEAL_WROCLAW;
 
 	public string $appealParamName = 'appeal';
 	public string $userAuthApiPasswordKey;
@@ -40,6 +41,11 @@ class Module extends BaseModule implements AppealInterface {
 	];
 
 	public array $appeals = [];
+
+	/**
+	 * @var SpiUserAuth[]
+	 */
+	private static $userAuth = [];
 
 	public static function getAppealsNames(): array {
 		return [
@@ -70,11 +76,11 @@ class Module extends BaseModule implements AppealInterface {
 
 	public function getAppeal(): string {
 		if ($this->appeal === null) {
-			$appeal = Yii::$app->request->get(
-				$this->appealParamName,
-			);
-			if ($appeal === null) {
-				$appeal = $this->getSpiApi()->getAppeal();
+			$appeal = null;
+			if (!Yii::$app->request->isConsoleRequest) {
+				$appeal = Yii::$app->request->get(
+					$this->appealParamName,
+				);
 			}
 			$this->appeal = $appeal;
 		}
@@ -102,8 +108,11 @@ class Module extends BaseModule implements AppealInterface {
 	}
 
 	public function getSpiApi(int $userId = null): SPIApi {
+		/**
+		 * @var SPIApi $api
+		 */
 		$api = Instance::ensure($this->spiApi, SPIApi::class);
-		if ($this->bindUserAuth) {
+		if ($this->bindUserAuth || $userId !== null) {
 			if ($userId === null) {
 				$userId = Yii::$app->user->getId();
 			}
@@ -116,8 +125,10 @@ class Module extends BaseModule implements AppealInterface {
 			}
 			$api->username = $model->username;
 			$api->password = $model->decryptPassword($this->userAuthApiPasswordKey);
-			$api->on(SPIApi::EVENT_AFTER_REQUEST, function ($event) use ($model) {
-				$model->touchLastActionAt();
+			$api->on(SPIApi::EVENT_AFTER_REQUEST, function (RequestEvent $event) use ($model, $api) {
+				if (!$api->isAuthRequest($event->request)) {
+					$model->touchLastActionAt();
+				}
 			});
 		}
 		$api->availableAppeals = $this->appeals;
@@ -157,7 +168,13 @@ class Module extends BaseModule implements AppealInterface {
 				$userId = Yii::$app->user->getId();
 			}
 		}
-		return $userId ? SpiUserAuth::findByUserId($userId) : null;
+		if ($userId === null) {
+			return null;
+		}
+		if (!isset(static::$userAuth[$userId])) {
+			static::$userAuth[$userId] = SpiUserAuth::findByUserId($userId);
+		}
+		return static::$userAuth[$userId];
 	}
 
 	/**

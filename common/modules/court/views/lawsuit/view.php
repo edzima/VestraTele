@@ -64,10 +64,10 @@ YiiAsset::register($this);
 		<?= $lawsuitDetails
 			? Html::a(
 				Html::icon('refresh'), [
-				'sync-spi-session', 'id' => $model->id, 'spiId' => $lawsuitDetails->id,
+				'sync-spi', 'id' => $model->id,
 			], [
-				'title' => Yii::t('court', 'Sync Sessions'),
-				'aria-label' => Yii::t('court', 'Sync Sessions'),
+				'title' => Yii::t('court', 'Sync with SPI'),
+				'aria-label' => Yii::t('court', 'Sync with SPI'),
 				'class' => 'btn btn-warning',
 				'data-method' => 'post',
 			])
@@ -90,9 +90,15 @@ YiiAsset::register($this);
 			<?= DetailView::widget([
 				'model' => $model,
 				'attributes' => [
+					[
+						'attribute' => 'result',
+						'visible' => !empty($model->result),
+					],
 					'signature_act',
 					[
 						'attribute' => 'courtName',
+						'captionOptions' => ['style' => 'white-space: nowrap'],
+						'contentOptions' => ['style' => 'width: 80%;'],
 						'value' => Html::a($model->court->name, ['court/view', 'id' => $model->court_id]),
 						'format' => 'html',
 					],
@@ -104,10 +110,24 @@ YiiAsset::register($this);
 					[
 						'attribute' => 'details',
 						'visible' => !empty($model->details),
+						'format' => 'ntext',
 					],
 					'creator',
 					'created_at:datetime',
 					'updated_at:datetime',
+					[
+						'attribute' => 'spi_last_sync_at',
+						'format' => 'datetime',
+					],
+					[
+						'attribute' => 'spi_last_update_at',
+						'format' => 'datetime',
+					],
+					[
+						'attribute' => 'spiConfirmedUser.fullName',
+						'label' => Yii::t('court', 'Confirmed User SPI'),
+						'visible' => !empty($model->spi_confirmed_user),
+					],
 				],
 			]) ?>
 

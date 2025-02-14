@@ -20,6 +20,7 @@ class LawsuitIssueForm extends Model {
 
 	public ?string $signature_act = '';
 	public ?string $details = '';
+	public ?string $result = '';
 	public bool $is_appeal = false;
 
 	public string $signaturePattern = LawsuitSignature::DEFAULT_PATTERN;
@@ -30,8 +31,9 @@ class LawsuitIssueForm extends Model {
 			[['!creator_id', 'court_id', 'signature_act'], 'required'],
 			[['creator_id', 'court_id'], 'integer'],
 			[['is_appeal'], 'boolean'],
-			[['signature_act', 'details'], 'string'],
-			[['signature_act'], 'trim'],
+			[['signature_act', 'details', 'result'], 'string'],
+			[['signature_act', 'details', 'result'], 'trim'],
+			[['details', 'result'], 'default', 'value' => null],
 			['signature_act', 'match', 'pattern' => $this->signaturePattern],
 			['signature_act', 'validateSignatureCourt'],
 			['issuesIds', 'exist', 'targetClass' => Issue::class, 'targetAttribute' => 'id', 'allowArray' => true],
@@ -93,6 +95,7 @@ class LawsuitIssueForm extends Model {
 		$model->details = $this->details;
 		$model->signature_act = $this->signature_act;
 		$model->is_appeal = $this->is_appeal;
+		$model->result = $this->result;
 		if (!$model->save(false)) {
 			return false;
 		}
@@ -120,6 +123,7 @@ class LawsuitIssueForm extends Model {
 		$this->signature_act = $model->signature_act;
 		$this->details = $model->details;
 		$this->is_appeal = $model->is_appeal;
+		$this->result = $model->result;
 		if (count($model->issues) === 1) {
 			$issues = $model->issues;
 			$this->setIssue(reset($issues));

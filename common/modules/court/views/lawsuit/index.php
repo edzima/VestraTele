@@ -9,6 +9,7 @@ use common\modules\court\Module;
 use common\modules\court\modules\spi\widgets\AppealsNavWidget;
 use common\widgets\grid\ActionColumn;
 use common\widgets\grid\CustomerIssuesDataColumn;
+use common\widgets\grid\DateTimeColumn;
 use common\widgets\grid\IssuesDataColumn;
 use common\widgets\GridView;
 use kartik\select2\Select2;
@@ -17,6 +18,7 @@ use yii\data\ActiveDataProvider;
 /** @var yii\web\View $this */
 /** @var LawsuitSearch $searchModel */
 /** @var ActiveDataProvider $dataProvider */
+/** @var bool $withSPI */
 
 $this->title = Yii::t('court', 'Lawsuits');
 $this->params['breadcrumbs'][] = Breadcrumbs::issues();
@@ -63,11 +65,18 @@ if ($searchModel->spiAppeal) {
 		) : '' ?>
 	</p>
 
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', ['model' => $searchModel]); ?>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'rowOptions' => function (Lawsuit $model): array {
+			$options = [];
+			if ($model->is_appeal) {
+				Html::addCssClass($options, 'warning');
+			}
+			return $options;
+		},
 		'columns' => [
 			[
 				'class' => IssuesDataColumn::class,
@@ -96,37 +105,36 @@ if ($searchModel->spiAppeal) {
 					],
 				],
 			],
-			[
-				'attribute' => 'court_type',
-				'value' => function (Lawsuit $data): string {
-					return $data->court->getTypeName();
-				},
-				'label' => $searchModel->getAttributeLabel('court_type'),
-				'filter' => LawsuitSearch::getCourtTypeNames(),
-				'filterType' => GridView::FILTER_SELECT2,
-				'filterInputOptions' => [
-					'placeholder' => $searchModel->getAttributeLabel('court_type'),
-				],
-				'filterWidgetOptions' => [
-					'size' => Select2::SIZE_SMALL,
-					'pluginOptions' => [
-						'allowClear' => true,
-						'dropdownAutoWidth' => true,
-					],
-				],
-			],
-			[
-				'attribute' => 'is_appeal',
-				'format' => 'boolean',
-			],
+			'result',
 			'signature_act',
-			'details',
-			'created_at:date',
-			'updated_at:date',
+			[
+				'class' => DateTimeColumn::class,
+				'attribute' => 'created_at',
+			],
+			[
+				'class' => DateTimeColumn::class,
+				'attribute' => 'updated_at',
+			],
 			[
 				'attribute' => 'creator_id',
 				'value' => 'creator',
 				'label' => Yii::t('court', 'Creator'),
+			],
+			[
+				'class' => DateTimeColumn::class,
+				'attribute' => 'spi_last_update_at',
+				'visible' => $withSPI,
+			],
+			[
+				'attribute' => 'spi_confirmed_user',
+				'value' => 'spiConfirmedUser',
+				'label' => Yii::t('court', 'Confirmed User SPI'),
+				'visible' => $withSPI,
+			],
+			[
+				'class' => DateTimeColumn::class,
+				'attribute' => 'spi_last_sync_at',
+				'visible' => $withSPI,
 			],
 			[
 				'class' => ActionColumn::class,

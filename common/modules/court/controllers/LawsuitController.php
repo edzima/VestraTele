@@ -4,6 +4,7 @@ namespace common\modules\court\controllers;
 
 use common\components\message\MessageTemplate;
 use common\helpers\Flash;
+use common\helpers\Html;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
 use common\models\issue\query\IssueUserQuery;
@@ -44,6 +45,8 @@ class LawsuitController extends Controller {
 						'delete' => ['POST'],
 						'link-issue' => ['POST'],
 						'unlink-issue' => ['POST'],
+						'spi-confirm' => ['POST'],
+						'sync-spi' => ['POST'],
 					],
 				],
 			]
@@ -67,6 +70,7 @@ class LawsuitController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'withSPI' => $this->module->spiModuleConfig !== null && Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL),
 		]);
 	}
 
@@ -223,13 +227,12 @@ class LawsuitController extends Controller {
 	 * @return string
 	 * @throws NotFoundHttpException if the model cannot be found
 	 */
-	public function actionView(int $id, bool $syncSpi = false, int $spiNotificationId = null): string {
+	public function actionView(int $id, int $spiNotificationId = null): string {
 		$model = $this->findModel($id);
 		$lawsuitDetails = null;
 		$notificationsDataProvider = null;
-		if (!empty($model->signature_act)
-			&& Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL)
-			&& $this->module->spi !== null
+		if (Yii::$app->user->can(Module::PERMISSION_SPI_LAWSUIT_DETAIL)
+			&& $this->module->getSPI() !== null
 		) {
 			$appeal = $model->court->getSPIAppealWithParents();
 			if (!$appeal) {
@@ -241,6 +244,19 @@ class LawsuitController extends Controller {
 				);
 			} else {
 				$this->view->params['appeal'] = $appeal;
+				if (empty($model->spi_confirmed_user) && !empty($model->spi_last_update_at)) {
+					Flash::add(
+						Flash::TYPE_WARNING,
+						Yii::t('court', 'Changes from SPI to {confirmLink}.', [
+							'confirmLink' => Html::a(
+								Yii::t('court', 'Confirm'),
+								['confirm-spi', 'id' => $model->id], [
+									'data-method' => 'post',
+								]
+							),
+						])
+					);
+				}
 
 				$lawsuitDetails = $this->findSpiLawsuit($model);
 
@@ -261,41 +277,38 @@ class LawsuitController extends Controller {
 		]);
 	}
 
-	public function actionSyncSpiSession(int $id, ?int $spiId = null) {
+	public function actionConfirmSpi(int $id) {
 		$model = $this->findModel($id);
-		$appeal = $model->court->getSPIAppealWithParents();
-		if ($appeal === null) {
-			throw new InvalidConfigException('SPI appeal model must be set.');
-		}
-		if ($spiId === null) {
-			$spiLawsuit = $this->findSpiLawsuit($model);
-			$spiId = $spiLawsuit->id;
-		}
-		if ($spiId === null) {
-			throw new InvalidConfigException('spi id must be set.');
-		}
-		$spiModule = $this->module->getSPI();
-		$sessions = $spiModule->getRepositoryManager()
-			->getCourtSessions()
-			->setAppeal($appeal)
-			->getByLawsuit($spiId)
-			->getModels();
-		$sync = $this->module->getSpiSync();
-		$count = $sync->sync($model, $sessions);
-		if ($count) {
-			Flash::add(
-				Flash::TYPE_SUCCESS,
-				Yii::t('court', 'Update Sessions: {count}', [
-					'count' => $count,
-				])
-			);
-		} else {
-			Flash::add(
-				Flash::TYPE_INFO,
-				Yii::t('court', 'All sessions is already synced.'),
-			);
-		}
+		$model->spi_confirmed_user = Yii::$app->user->getId();
+		$model->updateAttributes([
+			'spi_confirmed_user' => Yii::$app->user->getId(),
+		]);
 		return $this->redirect(['view', 'id' => $model->id]);
+	}
+
+	public function actionSyncSpi(int $id) {
+		$sync = $this->module->getSpiSync();
+		if ($sync) {
+			$model = $this->findModel($id);
+			if ($sync->one($model)) {
+				$sessionsCount = $sync->getSessionsCount();
+				if ($sessionsCount) {
+					Flash::add(
+						Flash::TYPE_SUCCESS,
+						Yii::t('court', 'Update Sessions: {count}', [
+							'count' => $sessionsCount,
+						])
+					);
+				} else {
+					Flash::add(
+						Flash::TYPE_INFO,
+						Yii::t('court', 'All sessions is already synced.'),
+					);
+				}
+			}
+		}
+
+		return $this->redirect(['view', 'id' => $id]);
 	}
 
 	private function findSpiLawsuit(Lawsuit $model): ?LawsuitViewIntegratorDto {

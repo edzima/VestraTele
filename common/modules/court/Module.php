@@ -2,7 +2,7 @@
 
 namespace common\modules\court;
 
-use common\modules\court\components\LawsuitSessionsSync;
+use common\modules\court\components\LawsuitSpiSync;
 use common\modules\court\controllers\SpiNotificationController;
 use common\modules\court\modules\spi\components\LawsuitSignature;
 use common\modules\court\modules\spi\Module as SpiModule;
@@ -23,7 +23,7 @@ class Module extends BaseModule {
 	public bool $onlyUserIssues;
 
 	public $syncSpiConfig = [
-		'class' => LawsuitSessionsSync::class,
+		'class' => LawsuitSpiSync::class,
 	];
 
 	public ?array $spiModuleConfig = [
@@ -53,15 +53,19 @@ class Module extends BaseModule {
 		return $this->getModule(static::SPI_MODULE_NAME);
 	}
 
-	public function getSpiSync(): ?LawsuitSessionsSync {
+	public function getSpiSync($userId = null): ?LawsuitSpiSync {
+		$spi = $this->getSPI();
+		if ($spi === null) {
+			return null;
+		}
 		if ($this->syncSpiConfig === false) {
 			return null;
 		}
 		$config = $this->syncSpiConfig;
 		if (!isset($config['class'])) {
-			$config['class'] = LawsuitSessionsSync::class;
+			$config['class'] = LawsuitSpiSync::class;
 		}
 
-		return Yii::createObject($config);
+		return Yii::createObject($config, [$spi->getRepositoryManager($userId)]);
 	}
 }

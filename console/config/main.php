@@ -1,5 +1,6 @@
 <?php
 
+use common\modules\court\Module as CourtModule;
 
 $params = array_merge(
 	require __DIR__ . '/../../common/config/params.php',
@@ -17,7 +18,14 @@ return [
 		'@bower' => '@vendor/bower-asset',
 		'@npm' => '@vendor/npm-asset',
 	],
-
+	'modules' => [
+		'court' => [
+			'class' => CourtModule::class,
+			'spiModuleConfig' => [
+				'userAuthApiPasswordKey' => $_ENV['SPI_USER_AUTH_PASSWORD_KEY'],
+			],
+		],
+	],
 	'controllerMap' => [
 		'migrate' => [
 			'class' => 'yii\console\controllers\MigrateController',

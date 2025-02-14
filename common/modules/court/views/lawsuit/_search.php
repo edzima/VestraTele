@@ -1,10 +1,11 @@
 <?php
 
+use common\modules\court\models\search\LawsuitSearch;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var common\modules\court\models\search\LawsuitSearch $model */
+/** @var LawsuitSearch $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
@@ -15,27 +16,27 @@ use yii\widgets\ActiveForm;
 		'method' => 'get',
 	]); ?>
 
-	<?= $form->field($model, 'id') ?>
+	<div class="row">
+		<?= $form->field($model, 'court_type', [
+			'options' => [
+				'class' => 'col-md-3 col-lg-2',
+			],
+		])->dropDownList(LawsuitSearch::getCourtTypeNames(), [
+			'prompt' => Yii::t('common', '--- Select ---'),
+		]) ?>
 
-	<?= $form->field($model, 'issue_id') ?>
+		<?= $form->field($model, 'is_appeal', [
+			'options' => [
+				'class' => 'col-md-2 col-lg-2',
+			],
+		])->checkbox() ?>
 
-	<?= $form->field($model, 'court_id') ?>
 
-	<?= $form->field($model, 'signature_act') ?>
-
-	<?= $form->field($model, 'room') ?>
-
-	<?php // echo $form->field($model, 'due_at') ?>
-
-	<?php // echo $form->field($model, 'created_at') ?>
-
-	<?php // echo $form->field($model, 'updated_at') ?>
-
-	<?php // echo $form->field($model, 'creator_id') ?>
+	</div>
 
 	<div class="form-group">
-		<?= Html::submitButton(Yii::t('court', 'Search'), ['class' => 'btn btn-primary']) ?>
-		<?= Html::resetButton(Yii::t('court', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
+		<?= Html::submitButton(Yii::t('common', 'Search'), ['class' => 'btn btn-primary']) ?>
+		<?= Html::resetButton(Yii::t('common', 'Reset'), ['class' => 'btn btn-outline-secondary']) ?>
 	</div>
 
 	<?php ActiveForm::end(); ?>

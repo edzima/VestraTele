@@ -43,7 +43,7 @@ class LawsuitSearch extends Lawsuit {
 			['!issueUserId', 'required', 'on' => self::SCENARIO_ISSUE_USER],
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
 			[['is_appeal'], 'default', 'value' => null],
-			[['courtName'], 'string'],
+			[['courtName', 'result'], 'string'],
 			[['customer', 'signature_act', 'details', 'created_at', 'updated_at', 'court_type', 'appeal'], 'safe'],
 		];
 	}
