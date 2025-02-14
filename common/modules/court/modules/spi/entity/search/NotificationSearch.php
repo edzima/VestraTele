@@ -63,12 +63,21 @@ class NotificationSearch extends SearchModel {
 				$this->lawsuitId = $lawsuit->id;
 			}
 		}
+		$read = null;
+		if (is_string($this->read) && strlen($this->read) === 1) {
+			$read = boolval($this->read);
+		} elseif (is_bool($this->read)) {
+			$read = $this->read;
+		}
 		$params = [
 			'content.contains' => $this->content,
 			'type.contains' => $this->type,
-			'read.specified' => $this->read ? 'true' : 'false',
 			'lawsuitId.equals' => $this->lawsuitId,
 		];
+		if ($read !== null) {
+			$params['read.equals'] = $read ? 'true' : 'false';
+		}
+
 		if (!empty($this->fromAt)) {
 			$params['date.greaterOrEqualThan'] = date(DATE_ATOM, strtotime($this->fromAt));
 		}

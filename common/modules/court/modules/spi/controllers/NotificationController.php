@@ -31,6 +31,7 @@ class NotificationController extends Controller {
 			$this->repository,
 			$appeal
 		);
+		$searchModel->read = false;
 		$searchModel->lawsuitRepository = $this->module
 			->getRepositoryManager()
 			->getLawsuits();
@@ -38,7 +39,6 @@ class NotificationController extends Controller {
 			Yii::$app->request->queryParams
 		);
 		$dataProvider->getSort()->defaultOrder = ['date' => SORT_DESC];
-		$this->repository->getUnread(false);
 
 		return $this->render('index', [
 			'searchModel' => $searchModel,
