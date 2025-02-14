@@ -24,8 +24,8 @@ class LawsuitViewIntegratorDto extends Model {
 	public string $departmentName;
 	public int $court;
 	public string $courtName;
-	public int $judge;
-	public string $judgeName;
+	public ?int $judge;
+	public ?string $judgeName;
 	public string $partyName;
 	public ?string $description;
 	public ?int $partyUserId;
