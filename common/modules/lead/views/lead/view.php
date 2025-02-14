@@ -62,7 +62,6 @@ if ($phoneBlacklist) {
 			]));
 	}
 }
-var_dump($isOwner);
 ?>
 <div class="lead-view">
 
