@@ -36,13 +36,6 @@ if ($searchModel->spiAppeal) {
 }
 ?>
 
-<?= AppealsNavWidget::widget([
-	'activeAppeal' => $searchModel->spiAppeal,
-	'getAppealFromModule' => false,
-	'activeFromModule' => false,
-	'appealParamName' => 'appeal',
-	'module' => Module::getInstance()->getSPI(),
-]) ?>
 
 <div class="court-lawsuit-index">
 
@@ -57,13 +50,21 @@ if ($searchModel->spiAppeal) {
 			Module::PERMISSION_SPI_LAWSUIT_DETAIL
 		) ? Html::a(
 			Html::faicon('bell'),
-			['/court/spi/notification/index'],
+			['/court/spi/notification/index', 'appeal' => $searchModel->spiAppeal],
 			[
 				'class' => 'btn btn-info',
 				'title' => Yii::t('court', 'Notification'),
 			]
 		) : '' ?>
 	</p>
+
+	<?= AppealsNavWidget::widget([
+		'activeAppeal' => $searchModel->spiAppeal,
+		'getAppealFromModule' => false,
+		'activeFromModule' => false,
+		'appealParamName' => 'appeal',
+		'module' => Module::getInstance()->getSPI(),
+	]) ?>
 
 	<?= $this->render('_search', [
 		'model' => $searchModel,
