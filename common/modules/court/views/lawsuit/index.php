@@ -65,8 +65,15 @@ if ($searchModel->spiAppeal) {
 		) : '' ?>
 	</p>
 
-	<?= $this->render('_search', ['model' => $searchModel]); ?>
+	<?= $this->render('_search', [
+		'model' => $searchModel,
+		'withSPI' => $withSPI,
+	]); ?>
 
+	<?= $this->render('_chart', [
+		'model' => $searchModel,
+		'dataProvider' => $dataProvider,
+	]) ?>
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
@@ -105,7 +112,21 @@ if ($searchModel->spiAppeal) {
 					],
 				],
 			],
-			'result',
+			[
+				'attribute' => 'result',
+				'filter' => $searchModel->getResultNames(),
+				'filterType' => GridView::FILTER_SELECT2,
+				'filterInputOptions' => [
+					'placeholder' => $searchModel->getAttributeLabel('result'),
+				],
+				'filterWidgetOptions' => [
+					'size' => Select2::SIZE_SMALL,
+					'pluginOptions' => [
+						'allowClear' => true,
+						'dropdownAutoWidth' => true,
+					],
+				],
+			],
 			'signature_act',
 			[
 				'class' => DateTimeColumn::class,
@@ -123,17 +144,6 @@ if ($searchModel->spiAppeal) {
 			[
 				'class' => DateTimeColumn::class,
 				'attribute' => 'spi_last_update_at',
-				'visible' => $withSPI,
-			],
-			[
-				'attribute' => 'spi_confirmed_user',
-				'value' => 'spiConfirmedUser',
-				'label' => Yii::t('court', 'Confirmed User SPI'),
-				'visible' => $withSPI,
-			],
-			[
-				'class' => DateTimeColumn::class,
-				'attribute' => 'spi_last_sync_at',
 				'visible' => $withSPI,
 			],
 			[

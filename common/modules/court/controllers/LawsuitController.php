@@ -66,7 +66,9 @@ class LawsuitController extends Controller {
 			$searchModel->issueUserId = Yii::$app->user->getId();
 		}
 		$dataProvider = $searchModel->search($this->request->queryParams);
-
+		$dataProvider->sort->defaultOrder = [
+			'updated_at' => SORT_DESC,
+		];
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,

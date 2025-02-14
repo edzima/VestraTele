@@ -65,4 +65,8 @@ return [
 	'SPI Last Sync At' => 'SPI - synchronizacja',
 	'Changes from SPI to {confirmLink}.' => '{confirmLink} zmiany z SPI',
 	'Confirm' => 'Zatwierdź',
+	'Without Result' => 'Brak',
+	'Only with Result' => 'Rozstrzygnięte',
+	'Session Result' => 'Posiedzenia',
+	'SPI to Confirm' => 'SPI - do zatwierdzenia',
 ];

@@ -27,11 +27,16 @@ class LawsuitSearch extends Lawsuit {
 
 	public $spiAppeal;
 
+	public $onlyWithResult;
+
+	public $spiToConfirm;
 	public const SCENARIO_ISSUE_USER = 'issue_user_id';
 
 	public function attributeLabels(): array {
 		return parent::attributeLabels() + [
+				'spiToConfirm' => Yii::t('court', 'SPI to Confirm'),
 				'court_type' => Yii::t('court', 'Type'),
+				'onlyWithResult' => Yii::t('court', 'Only with Result'),
 			];
 	}
 
@@ -42,6 +47,7 @@ class LawsuitSearch extends Lawsuit {
 		return [
 			['!issueUserId', 'required', 'on' => self::SCENARIO_ISSUE_USER],
 			[['id', 'court_id', 'creator_id', 'issue_id'], 'integer'],
+			[['onlyWithResult', 'spiToConfirm'], 'boolean'],
 			[['is_appeal'], 'default', 'value' => null],
 			[['courtName', 'result'], 'string'],
 			[['customer', 'signature_act', 'details', 'created_at', 'updated_at', 'court_type', 'appeal'], 'safe'],
@@ -87,6 +93,8 @@ class LawsuitSearch extends Lawsuit {
 		$this->applyIssueUserFilter($query);
 		$this->applyCustomerFilter($query);
 		$this->applySpiAppealFilter($query);
+		$this->applyResultFilter($query);
+		$this->applySPIToConfirmFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
@@ -101,6 +109,7 @@ class LawsuitSearch extends Lawsuit {
 
 		$query->andFilterWhere(['like', Lawsuit::tableName() . '.signature_act', $this->signature_act])
 			->andFilterWhere(['like', Lawsuit::tableName() . '.details', $this->details])
+			->andFilterWhere(['like', Lawsuit::tableName() . '.result', $this->details])
 			->andFilterWhere(['like', Court::tableName() . '.name', $this->courtName])
 			->andFilterWhere(['like', Issue::tableName() . '.id', $this->issue_id . '%', false]);
 
@@ -150,6 +159,54 @@ class LawsuitSearch extends Lawsuit {
 	private function applyIssueUserFilter(LawsuitQuery $query): void {
 		if (!empty($this->issueUserId)) {
 			$query->usersIssues((array) $this->issueUserId);
+		}
+	}
+
+	private ?array $resultNames = null;
+
+	public function getResultNames(): array {
+		if ($this->resultNames === null) {
+			$this->resultNames = Lawsuit::find()
+				->select('result')
+				->distinct()
+				->indexBy('result')
+				->column();
+		}
+		return $this->resultNames;
+	}
+
+	public function setResultNames(array $names): void {
+		$this->resultNames = $names;
+	}
+
+	private function applySPIToConfirmFilter(ActiveQuery $query): void {
+		if (strlen($this->spiToConfirm) === 1) {
+			if ($this->spiToConfirm) {
+				$query->andWhere(Lawsuit::tableName() . '.spi_confirmed_user IS NULL');
+			} else {
+				$query->andWhere(Lawsuit::tableName() . '.spi_confirmed_user IS NOT NULL');
+			}
+		}
+	}
+
+	private function applyResultFilter(LawsuitQuery $query): void {
+		if (!empty($this->result)) {
+			if ($this->result === Yii::t('court', 'Without Result')) {
+				$this->onlyWithResult = true;
+			} else {
+				$query->andWhere([
+					'like',
+					Lawsuit::tableName() . '.result',
+					$this->result,
+				]);
+			}
+		}
+		if (strlen($this->onlyWithResult) === 1) {
+			if ($this->onlyWithResult) {
+				$query->andWhere(Lawsuit::tableName() . '.result IS NOT NULL');
+			} else {
+				$query->andWhere(Lawsuit::tableName() . '.result IS NULL');
+			}
 		}
 	}
 }
