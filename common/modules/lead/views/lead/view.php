@@ -62,6 +62,7 @@ if ($phoneBlacklist) {
 			]));
 	}
 }
+var_dump($isOwner);
 ?>
 <div class="lead-view">
 
@@ -187,6 +188,10 @@ if ($phoneBlacklist) {
 						<?= DetailView::widget([
 							'model' => $model,
 							'attributes' => [
+								[
+									'attribute' => 'owner',
+									'visible' => !$isOwner,
+								],
 								'status',
 								[
 									'attribute' => 'source.type.nameWithDescription',
