@@ -5,6 +5,7 @@ namespace common\modules\court;
 use common\modules\court\components\LawsuitSpiSync;
 use common\modules\court\controllers\SpiNotificationController;
 use common\modules\court\modules\spi\components\LawsuitSignature;
+use common\modules\court\modules\spi\entity\AppealInterface;
 use common\modules\court\modules\spi\Module as SpiModule;
 use Yii;
 use yii\base\Module as BaseModule;
@@ -60,6 +61,9 @@ class Module extends BaseModule {
 		}
 		if ($this->syncSpiConfig === false) {
 			return null;
+		}
+		if ($spi->appeal === null) {
+			$spi->appeal = AppealInterface::APPEAL_WROCLAW;
 		}
 		$config = $this->syncSpiConfig;
 		if (!isset($config['class'])) {

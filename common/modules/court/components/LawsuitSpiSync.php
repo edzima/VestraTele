@@ -5,8 +5,10 @@ namespace common\modules\court\components;
 use common\modules\court\models\Lawsuit;
 use common\modules\court\modules\spi\entity\lawsuit\LawsuitViewIntegratorDto;
 use common\modules\court\modules\spi\repository\RepositoryManager;
+use Yii;
 use yii\base\Component;
 use yii\di\Instance;
+use yii\helpers\Console;
 
 class LawsuitSpiSync extends Component {
 
@@ -51,8 +53,18 @@ class LawsuitSpiSync extends Component {
 			return false;
 		}
 		if (!$this->shouldSync($model, $spiLawsuit)) {
+			if (Yii::$app->request->isConsoleRequest) {
+				Console::output('Lawsuit: ' . $spiLawsuit->signature . ' in Appeal: ' . $appeal . ' has already synced.');
+			}
+			$model->updateAttributes([
+				'spi_last_sync_at' => date(DATE_ATOM),
+			]);
 			return false;
 		}
+		if (Yii::$app->request->isConsoleRequest) {
+			Console::output('Sync Lawsuit: ' . $spiLawsuit->signature . ' in Appeal: ' . $appeal);
+		}
+
 		$attributes = $this->getLawsuitAttributes($spiLawsuit);
 		$attributes['spi_confirmed_user'] = null;
 		$attributes['spi_last_sync_at'] = date(DATE_ATOM);
