@@ -242,16 +242,6 @@ class IssueSearch extends BaseIssueSearch {
 		return User::getSelectList($ids, false);
 	}
 
-	public function getAllIds(QueryInterface $query, bool $refresh = false): array {
-		if ($refresh || $this->ids === null) {
-			$query = clone $query;
-			$query->select(Issue::tableName() . '.id');
-			$this->payedFilter($query);
-			$this->ids = $query->column();
-		}
-		return $this->ids;
-	}
-
 	private function stageChangeAtFilter(IssueQuery $query): void {
 		if (!empty($this->stage_change_at)) {
 			$query->andWhere(['>=', Issue::tableName() . '.stage_change_at', date('Y-m-d 00:00:00', strtotime($this->stage_change_at))]);

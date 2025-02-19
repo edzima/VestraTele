@@ -112,6 +112,43 @@ class SummonController extends Controller {
 		]);
 	}
 
+	public function actionCreateMultiple(int $typeId = null, string $returnUrl = null, array $ids = []) {
+		$model = new SummonForm();
+		if (empty($ids)) {
+			$ids = IssueController::getSelectionSearchIds();
+		}
+		$model->issuesIds = $ids;
+
+		$id = $ids[array_key_first($ids)];
+		if (count($ids) === 1) {
+			return $this->redirect('create', [
+				'typeId' => $typeId,
+				'returnUrl' => $returnUrl,
+				'id' => $id,
+			]);
+		}
+		$model->issue_id = $id;
+		$model->owner_id = Yii::$app->user->id;
+		$model->start_at = date('Y-m-d');
+		if ($typeId && isset(SummonType::getModels()[$typeId])) {
+			$model->setType(SummonType::getModels()[$typeId]);
+		}
+
+		if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+			$count = $model->createMultiple(false);
+			if ($count) {
+				Flash::add(Flash::TYPE_SUCCESS,
+					Yii::t('backend', 'Success create Summons for Issues: {count}', [
+						'count' => $count,
+					]));
+			}
+			return $this->redirect('index');
+		}
+		return $this->render('create-multiple', [
+			'model' => $model,
+		]);
+	}
+
 	/**
 	 * Updates an existing Summon model.
 	 * If update is successful, the browser will be redirected to the 'view' page.

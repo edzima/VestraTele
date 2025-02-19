@@ -11,6 +11,7 @@ use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $searchModel IssueSearch */
 /* @var $dataProvider ActiveDataProvider */
+/* @var $queryParams array */
 
 $this->title = Yii::t('backend', 'Issues');
 
@@ -23,6 +24,9 @@ if (!$searchModel->getIssueMainType()) {
 $this->params['issueParentTypeNav'] = [
 	'route' => ['/issue/issue/index'],
 ];
+
+$count = $dataProvider->getTotalCount();
+
 ?>
 <div class="issue-index">
 
@@ -74,16 +78,14 @@ $this->params['issueParentTypeNav'] = [
 				!empty($dataProvider->getModels())
 				&& $dataProvider->pagination->pageCount > 1
 					? Html::a(
-					count($searchModel->getAllIds($dataProvider->query)), [
+					$count, [
 					'sms/push-multiple',
 				],
 					[
 						'data' => [
 							'pjax' => '0',
 							'method' => 'POST',
-							'params' => [
-								'ids' => $searchModel->getAllIds($dataProvider->query),
-							],
+							'params' => $queryParams,
 						],
 						'class' => 'btn btn-success',
 					]
@@ -111,23 +113,21 @@ $this->params['issueParentTypeNav'] = [
 				?>
 				<?= !empty($dataProvider->getModels())
 				&& $dataProvider->pagination->pageCount > 1
-					? Html::a(count($searchModel->getAllIds($dataProvider->query)), [
+					? Html::a($count, [
 						'type/update-multiple',
 					],
 						[
 							'data' => [
 								'pjax' => '0',
 								'method' => 'POST',
-								'params' => [
-									'ids' => $searchModel->getAllIds($dataProvider->query),
-								],
+								'params' => $queryParams,
 							],
 							'class' => 'btn btn-info',
 							'title' => Yii::t('issue', 'Update Type: {count}', [
-								'count' => count($searchModel->getAllIds($dataProvider->query)),
+								'count' => $count,
 							]),
 							'aria-label' => Yii::t('issue', 'Update Type: {count}', [
-								'count' => count($searchModel->getAllIds($dataProvider->query)),
+								'count' => $count,
 							]),
 						]
 					)
@@ -153,23 +153,61 @@ $this->params['issueParentTypeNav'] = [
 				?>
 				<?= !empty($dataProvider->getModels())
 				&& $dataProvider->pagination->pageCount > 1
-					? Html::a(count($searchModel->getAllIds($dataProvider->query)), [
+					? Html::a($count, [
 						'tag/link-multiple',
 					],
 						[
 							'data' => [
 								'pjax' => '0',
 								'method' => 'POST',
-								'params' => [
-									'ids' => $searchModel->getAllIds($dataProvider->query),
-								],
+								'params' => $queryParams,
 							],
 							'class' => 'btn btn-success',
 							'title' => Yii::t('issue', 'Link Tags: {count}', [
-								'count' => count($searchModel->getAllIds($dataProvider->query)),
+								'count' => $count,
 							]),
 							'aria-label' => Yii::t('issue', 'Link Tags: {count}', [
-								'count' => count($searchModel->getAllIds($dataProvider->query)),
+								'count' => $count,
+							]),
+						]
+					)
+					: ''
+				?>
+			</span>
+
+			<?php endif; ?>
+
+			<?php if (Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)): ?>
+
+				<span class="btn-group">
+				<?= Html::submitButton(
+					Html::faicon('bolt'),
+					[
+						'class' => 'btn btn-warning',
+						'name' => 'route',
+						'value' => 'summon/create-multiple',
+						'data-pjax' => '0',
+						'title' => Yii::t('issue', 'Summons'),
+						'aria-label' => Yii::t('issue', 'Summons'),
+					])
+				?>
+				<?= !empty($dataProvider->getModels())
+				&& $dataProvider->pagination->pageCount > 1
+					? Html::a($count, [
+						'summon/create-multiple',
+					],
+						[
+							'data' => [
+								'pjax' => '0',
+								'method' => 'POST',
+								'params' => $queryParams,
+							],
+							'class' => 'btn btn-warning',
+							'title' => Yii::t('backend', 'Create Summons: {count}', [
+								'count' => $count,
+							]),
+							'aria-label' => Yii::t('backend', 'Create Summons: {count}', [
+								'count' => $count,
 							]),
 						]
 					)

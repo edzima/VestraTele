@@ -65,6 +65,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 
 	public ?int $updater_id = null;
 
+	public array $issuesIds = [];
+
 	public bool $sendEmailToContractor = true;
 
 	private ?Summon $model = null;
@@ -205,8 +207,8 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		$this->realized_at = $model->realized_at;
 	}
 
-	public function save(): bool {
-		if (!$this->validate()) {
+	public function save(bool $validate = true): bool {
+		if ($validate && !$this->validate()) {
 			Yii::warning($this->getErrors(), 'summonForm.validate');
 			return false;
 		}
@@ -222,6 +224,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		$model->city_id = $this->city_id;
 		$model->entity_id = $this->entity_id;
 		$model->updater_id = $this->updater_id;
+		$isNewRecord = $model->isNewRecord;
 		if (empty($this->realize_at) && $this->defaultRealizeAtFromStartAt) {
 			$dateTime = new DateTime($this->start_at);
 			$dateTime->setTime(date('H'), date('i'));
@@ -243,7 +246,7 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		}
 		$model->realized_at = $this->realized_at;
 		if ($model->save()) {
-			$this->saveDocs();
+			$this->saveDocs($isNewRecord);
 			return true;
 		}
 		Yii::warning($model->getErrors(), 'summonForm.save');
@@ -251,14 +254,14 @@ class SummonForm extends Model implements HiddenFieldsModel {
 		return false;
 	}
 
-	public function saveDocs(): void {
+	public function saveDocs(bool $isNewRecord = false): void {
 		$model = $this->getModel();
 		if (empty($this->doc_types_ids)) {
-			if (!$model->isNewRecord) {
+			if (!$isNewRecord) {
 				$model->unlinkAll('docs', true);
 			}
 		} else {
-			if ($model->isNewRecord) {
+			if ($isNewRecord) {
 				$this->linkDocsTypes($this->doc_types_ids);
 			} else {
 				$currentTypesIds = ArrayHelper::getColumn($model->docsLink, 'doc_type_id');
