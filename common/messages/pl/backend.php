@@ -367,4 +367,9 @@ return [
 	'Are you sure you want to change the status to:{status} for this workers?' => 'Jesteś pewny, że chcesz zmienić Status na: {status}?',
 	'Status changed successfully.' => 'Pomyślnie zmieniono Status.',
 	'Without user types' => 'Wykluczone Obecności',
+	'Create Summons' => 'Dodaj Zlecenia',
+	'Create Summons: {type}' => 'Dodaj Zlecenia: {type}',
+	'Create Summons for Issues: {count}' => 'Dodaj Zlecenia do Spraw: {count}',
+	'Create Summons: {type} for Issues: {count}' => 'Dodaj Zlecenia: {type} do Spraw: {count}',
+	'Success create Summons for Issues: {count}' => 'Dodano Zlecenia do Spraw: {count}',
 ];

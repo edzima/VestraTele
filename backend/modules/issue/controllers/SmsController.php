@@ -13,19 +13,7 @@ class SmsController extends BaseSmsController {
 
 	public function actionPushMultiple(array $ids = []) {
 		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('ids');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
-		if (empty($ids)) {
-			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('backend', 'IDs must be set.')
-			);
-			return $this->redirect(['issue/index']);
+			$ids = IssueController::getSelectionSearchIds();
 		}
 		if (count($ids) === 1) {
 			return $this->redirect(['push', 'id' => reset($ids)]);

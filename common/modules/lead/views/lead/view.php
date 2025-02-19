@@ -187,6 +187,10 @@ if ($phoneBlacklist) {
 						<?= DetailView::widget([
 							'model' => $model,
 							'attributes' => [
+								[
+									'attribute' => 'owner',
+									'visible' => !$isOwner,
+								],
 								'status',
 								[
 									'attribute' => 'source.type.nameWithDescription',

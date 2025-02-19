@@ -24,6 +24,7 @@ use common\modules\lead\models\forms\IssueLeadForm;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\filters\VerbFilter;
+use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -32,6 +33,9 @@ use yii2tech\csvgrid\CsvGrid;
 
 /**
  * IssueController implements the CRUD actions for Issue model.
+ *
+ * @see SelectionRouteBehavior
+ * @method array getQueryParams()
  */
 class IssueController extends Controller {
 
@@ -40,19 +44,32 @@ class IssueController extends Controller {
 	 */
 	public function behaviors(): array {
 		return [
+			'selection' => static::getSelectionBehaviorsConfig(),
+			'typeTypeParent' => [
+				'class' => IssueTypeParentIdAction::class,
+			],
 			'verbs' => [
 				'class' => VerbFilter::class,
 				'actions' => [
 					'delete' => ['POST'],
 				],
 			],
-			'selection' => [
-				'class' => SelectionRouteBehavior::class,
-			],
-			'typeTypeParent' => [
-				'class' => IssueTypeParentIdAction::class,
-			],
 		];
+	}
+
+	/**
+	 * @param bool $requiredThrow
+	 * @return array|null
+	 * @throws BadRequestHttpException
+	 */
+	public static function getSelectionSearchIds(bool $requiredThrow = true): ?array {
+		$selection = Yii::createObject(static::getSelectionBehaviorsConfig());
+		/* @var SelectionRouteBehavior $selection */
+		$ids = $selection->getSelectionSearchIds();
+		if ($requiredThrow && empty($ids)) {
+			throw new BadRequestHttpException(Yii::t('yii', 'IDs must be set.'));
+		}
+		return $ids;
 	}
 
 	/**
@@ -60,26 +77,9 @@ class IssueController extends Controller {
 	 *
 	 * @return mixed
 	 */
-	public function actionIndex(int $parentTypeId = null) {
-		$searchModel = new IssueSearch();
+	public function actionIndex(?int $parentTypeId = null) {
+		$searchModel = $this->createSearchModel($parentTypeId);
 
-		$searchModel->parentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
-
-		$searchModel->userId = Yii::$app->user->id;
-		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
-			$searchModel->withArchive = true;
-			$searchModel->excludeArchiveStage();
-		}
-		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE_DEEP)) {
-			$searchModel->withArchiveDeep = true;
-			$searchModel->excludeArchiveDeepStage();
-		}
-		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
-			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
-			if (Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)) {
-				$searchModel->withArchiveOnAllPayedPay = true;
-			}
-		}
 		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 		if (isset($_POST[CsvForm::BUTTON_NAME])) {
 			/** @var IssueQuery $query */
@@ -186,7 +186,30 @@ class IssueController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'queryParams' => $this->getQueryParams(),
 		]);
+	}
+
+	private static function createSearchModel(?int $parentTypeId = null): IssueSearch {
+		$parentTypeId = IssueTypeParentIdAction::validate($parentTypeId);
+		$searchModel = new IssueSearch();
+		$searchModel->parentTypeId = $parentTypeId;
+		$searchModel->userId = Yii::$app->user->id;
+		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE)) {
+			$searchModel->withArchive = true;
+			$searchModel->excludeArchiveStage();
+		}
+		if (Yii::$app->user->can(Worker::PERMISSION_ARCHIVE_DEEP)) {
+			$searchModel->withArchiveDeep = true;
+			$searchModel->excludeArchiveDeepStage();
+		}
+		if (Yii::$app->user->can(Worker::PERMISSION_PAY_ALL_PAID)) {
+			$searchModel->scenario = IssueSearch::SCENARIO_ALL_PAYED;
+			if (Yii::$app->user->can(Worker::ROLE_BOOKKEEPER)) {
+				$searchModel->withArchiveOnAllPayedPay = true;
+			}
+		}
+		return $searchModel;
 	}
 
 	public function actionArchive(): string {
@@ -425,6 +448,15 @@ class IssueController extends Controller {
 		if (!empty($data)) {
 			Yii::$app->leadClient->addFromCustomer($data);
 		}
+	}
+
+	private static function getSelectionBehaviorsConfig(): array {
+		return [
+			'class' => SelectionRouteBehavior::class,
+			'searchModel' => function (): IssueSearch {
+				return static::createSearchModel();
+			},
+		];
 	}
 
 }

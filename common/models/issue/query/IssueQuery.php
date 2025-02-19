@@ -6,6 +6,7 @@ use common\models\issue\Issue;
 use common\models\issue\IssueStage;
 use common\models\issue\IssueType;
 use common\models\issue\IssueUser;
+use common\models\query\IdsActiveQuery;
 use Yii;
 use yii\db\ActiveQuery;
 
@@ -14,7 +15,14 @@ use yii\db\ActiveQuery;
  *
  * @see Issue
  */
-class IssueQuery extends ActiveQuery {
+class IssueQuery extends ActiveQuery implements IdsActiveQuery {
+
+	public function getIds(): array {
+		$self = clone $this;
+		$self->select(Issue::tableName() . '.id');
+		$self->groupBy(Issue::tableName() . '.id');
+		return $self->column();
+	}
 
 	public function userTypes(int $userId, bool $withChildren = true): self {
 		$ids = Yii::$app->issueTypeUser->getUserTypesIds($userId);

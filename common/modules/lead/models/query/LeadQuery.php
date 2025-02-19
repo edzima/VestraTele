@@ -3,6 +3,7 @@
 namespace common\modules\lead\models\query;
 
 use common\helpers\ArrayHelper;
+use common\models\query\IdsActiveQuery;
 use common\models\query\PhonableQuery;
 use common\models\query\PhonableQueryTrait;
 use common\modules\lead\models\Lead;
@@ -15,7 +16,7 @@ use yii\db\ActiveQuery;
  *
  * @see Lead
  */
-class LeadQuery extends ActiveQuery implements PhonableQuery {
+class LeadQuery extends ActiveQuery implements PhonableQuery, IdsActiveQuery {
 
 	use PhonableQueryTrait;
 

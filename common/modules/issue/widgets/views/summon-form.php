@@ -23,6 +23,11 @@ use yii\web\View;
 		]); ?>
 
 		<div class="row">
+
+			<?= !empty($model->issuesIds)
+				? Html::hiddenInput('issuesIds', implode(',', $model->issuesIds))
+				: ''
+			?>
 			<?= $form->field($model, 'doc_types_ids', [
 				'options' => [
 					'class' => 'col-md-12',
@@ -64,12 +69,6 @@ use yii\web\View;
 		</div>
 
 		<div class="row">
-
-			<?= $form->field($model, 'issue_id', [
-				'options' => [
-					'class' => 'col-md-1',
-				],
-			])->textInput(['maxlength' => true]) ?>
 
 			<?= $form->field($model, 'type_id', [
 				'options' => [

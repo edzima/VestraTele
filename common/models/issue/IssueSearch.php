@@ -259,6 +259,14 @@ abstract class IssueSearch extends Model
 		return Model::scenarios();
 	}
 
+	public function load($data, $formName = null) {
+		if (isset($data['parentTypeId'])
+			&& $formName === null && !isset($data[$this->formName()]['parentTypeId'])) {
+			$data[$this->formName()]['parentTypeId'] = $data['parentTypeId'];
+		}
+		return parent::load($data, $formName = null);
+	}
+
 	/**
 	 * Creates data provider instance with search query applied
 	 *

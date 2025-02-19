@@ -53,19 +53,7 @@ class TypeController extends Controller {
 
 	public function actionUpdateMultiple(array $ids = []) {
 		if (empty($ids)) {
-			$postIds = Yii::$app->request->post('ids');
-			if (is_string($postIds)) {
-				$postIds = explode(',', $postIds);
-			}
-			if ($postIds) {
-				$ids = $postIds;
-			}
-		}
-		if (empty($ids)) {
-			Flash::add(Flash::TYPE_WARNING,
-				Yii::t('backend', 'IDs must be set.')
-			);
-			return $this->redirect(['issue/index']);
+			$ids = IssueController::getSelectionSearchIds();
 		}
 
 		$model = new IssuesUpdateTypeMultiple();
