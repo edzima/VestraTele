@@ -66,6 +66,7 @@ use yii\db\Expression;
  * @property-read Issue[] $linkedIssues
  * @property-read IssueNote|null $newestNote
  * @property-read IssueFile[] $issueFiles
+ * @property-read Lawsuit[] $lawsuits
  */
 class Issue extends ActiveRecord implements
 	IssueInterface,

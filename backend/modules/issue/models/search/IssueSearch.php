@@ -10,6 +10,7 @@ use common\models\issue\IssueUser;
 use common\models\issue\query\IssuePayQuery;
 use common\models\issue\query\IssueQuery;
 use common\models\user\User;
+use common\modules\court\models\Lawsuit;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
@@ -165,7 +166,11 @@ class IssueSearch extends BaseIssueSearch {
 	}
 
 	private function signatureActFilter(IssueQuery $query): void {
-		$query->andFilterWhere(['like', Issue::tableName() . '.signature_act', $this->signature_act]);
+		if (!empty($this->signature_act)) {
+			$query->andWhere(['like', Issue::tableName() . '.signature_act', $this->signature_act]);
+			$query->joinWith('lawsuits');
+			$query->orWhere(['like', Lawsuit::tableName() . '.signature_act', $this->signature_act]);
+		}
 	}
 
 	public function applyAgentsFilters(QueryInterface $query): void {

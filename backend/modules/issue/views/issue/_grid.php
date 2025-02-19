@@ -6,6 +6,7 @@ use backend\modules\issue\widgets\StageChangeButtonDropdown;
 use backend\widgets\GridView;
 use backend\widgets\IssueColumn;
 use common\assets\TooltipAsset;
+use common\helpers\ArrayHelper;
 use common\helpers\Html;
 use common\models\issue\Issue;
 use common\models\user\User;
@@ -105,6 +106,20 @@ $this->registerJs($js);
 		[
 			'attribute' => 'signature_act',
 			'visible' => !empty($searchModel->signature_act),
+			'options' => [
+				'style' => 'width:180px',
+			],
+		],
+		[
+			'attribute' => 'signature_act',
+			'label' => Yii::t('court', 'Lawsuits'),
+			'visible' => !empty($searchModel->signature_act),
+			'value' => function (Issue $model): ?string {
+				$lawsuits = $model->lawsuits;
+				$signatures = ArrayHelper::getColumn($lawsuits, 'signature_act');
+				return Html::ul($signatures);
+			},
+			'format' => 'html',
 			'options' => [
 				'style' => 'width:180px',
 			],
