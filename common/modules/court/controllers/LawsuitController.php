@@ -7,6 +7,7 @@ use common\helpers\Flash;
 use common\helpers\Html;
 use common\models\issue\Issue;
 use common\models\issue\IssueInterface;
+use common\models\issue\IssueUser;
 use common\models\issue\query\IssueUserQuery;
 use common\models\message\IssueLawsuitSmsForm;
 use common\modules\court\models\Lawsuit;
@@ -174,8 +175,11 @@ class LawsuitController extends Controller {
 					->joinWith([
 						'users' => function (IssueUserQuery $query) use ($customerParty) {
 							$query->withUserFullName($customerParty->name);
+							$query->withTypes(IssueUser::TYPES_CUSTOMERS);
 						},
-					]),
+					])
+					->groupBy(Issue::tableName() . '.id')
+					->withoutArchives(),
 			]
 		);
 		if (count($issueDataProvider->getModels()) === 0) {
@@ -293,6 +297,7 @@ class LawsuitController extends Controller {
 
 	public function actionSyncSpi(int $id) {
 		$sync = $this->module->getSpiSync();
+
 		if ($sync) {
 			$model = $this->findModel($id);
 			if ($sync->one($model)) {
