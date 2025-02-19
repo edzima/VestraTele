@@ -420,6 +420,17 @@ div:target {
 	color: #333;
 }
 
+.dropdown-raw-buttons > li > button {
+	all: unset;
+	color: #777;
+	display: block;
+	clear: both;
+	white-space: nowrap;
+	font-size: 14px;
+	cursor: pointer;
+}
 
-
-
+.dropdown-raw-buttons > li:hover {
+	background-color: #e1e3e9;
+	color: #333;
+}

@@ -7,6 +7,7 @@ return [
 	'enablePrettyUrl' => true,
 	'showScriptName' => false,
 	'rules' => [
-		// url rules
+		'issue/summon/create/<typeId>' => 'issue/summon/create',
+		'issue/summon/create-multiple/<typeId>' => 'issue/summon/create-multiple',
 	],
 ];

@@ -142,7 +142,7 @@ class SummonController extends Controller {
 						'count' => $count,
 					]));
 			}
-			return $this->redirect('index');
+			return $this->redirect($returnUrl ?: 'index');
 		}
 		return $this->render('create-multiple', [
 			'model' => $model,

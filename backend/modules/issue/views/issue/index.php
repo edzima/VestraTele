@@ -3,7 +3,10 @@
 use backend\helpers\Html;
 use backend\modules\issue\models\search\IssueSearch;
 use common\behaviors\IssueTypeParentIdAction;
+use common\helpers\Url;
+use common\models\issue\SummonType;
 use common\models\user\Worker;
+use common\widgets\ButtonDropdown;
 use common\widgets\grid\SelectionForm;
 use yii\data\ActiveDataProvider;
 use yii\widgets\Pjax;
@@ -57,7 +60,7 @@ $count = $dataProvider->getTotalCount();
 		]);
 		?>
 
-		<p class="selection-form-wrapper hidden">
+		<div class="selection-form-wrapper hidden">
 
 			<?php if (Yii::$app->user->can(Worker::PERMISSION_MULTIPLE_SMS)): ?>
 				<span class="btn-group">
@@ -180,45 +183,80 @@ $count = $dataProvider->getTotalCount();
 			<?php if (Yii::$app->user->can(Worker::PERMISSION_SUMMON_MANAGER)): ?>
 
 				<span class="btn-group">
-				<?= Html::submitButton(
-					Html::faicon('bolt'),
-					[
-						'class' => 'btn btn-warning',
-						'name' => 'route',
-						'value' => 'summon/create-multiple',
-						'data-pjax' => '0',
-						'title' => Yii::t('issue', 'Summons'),
-						'aria-label' => Yii::t('issue', 'Summons'),
-					])
-				?>
-				<?= !empty($dataProvider->getModels())
-				&& $dataProvider->pagination->pageCount > 1
-					? Html::a($count, [
-						'summon/create-multiple',
-					],
-						[
-							'data' => [
-								'pjax' => '0',
-								'method' => 'POST',
-								'params' => $queryParams,
+
+					<?php
+					$selectionItems = [];
+					foreach (SummonType::getNames() as $id => $name) {
+						$selectionItems[] = [
+							'label' => Html::submitButton(
+								Html::encode($name),
+								[
+									'name' => 'route',
+									'value' => Url::to(['summon/create-multiple', 'typeId' => $id]),
+									'data-pjax' => '0',
+								]),
+							'encode' => false,
+							'options' => [
+								'class' => 'raw-button',
 							],
-							'class' => 'btn btn-warning',
-							'title' => Yii::t('backend', 'Create Summons: {count}', [
-								'count' => $count,
-							]),
-							'aria-label' => Yii::t('backend', 'Create Summons: {count}', [
-								'count' => $count,
-							]),
-						]
-					)
-					: ''
-				?>
+						];
+						$allItems[] = [
+							'label' => $name,
+							'url' => ['summon/create-multiple', 'typeId' => $id],
+							'linkOptions' => [
+								'data' => [
+									'pjax' => '0',
+									'method' => 'POST',
+									'params' => $queryParams,
+								],
+							],
+						];
+					}
+
+					?>
+
+					<?= !empty($selectionItems)
+						? ButtonDropdown::widget([
+							'dropdown' => [
+								'items' => $selectionItems,
+								'options' => [
+									'class' => 'dropdown-raw-buttons',
+								],
+							],
+							'label' => Html::faicon('bolt'),
+							'encodeLabel' => false,
+							'options' => [
+								'class' => 'btn btn-warning dropdown-raw-buttons',
+							],
+						])
+						: ''
+					?>
+
+
+					<?= !empty($allItems && $dataProvider->pagination->pageCount > 1)
+						? ButtonDropdown::widget([
+							'dropdown' => [
+								'items' => $allItems,
+							],
+							'label' => $count,
+							'options' => [
+								'class' => 'btn btn-warning',
+								'title' => Yii::t('backend', 'Create Summons for Issues: {count}', [
+									'count' => $count,
+								]),
+								'aria-label' => Yii::t('backend', 'Create Summons for Issues: {count}', [
+									'count' => $count,
+								]),
+							],
+						])
+						: ''
+					?>
 			</span>
 
 			<?php endif; ?>
 
 
-		</p>
+		</div>
 	</div>
 
 
