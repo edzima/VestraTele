@@ -439,4 +439,7 @@ div:target {
 	cursor: pointer;
 }
 
-
+.dropdown-raw-buttons > li:hover {
+	background-color: #e1e3e9;
+	color: #333;
+}
