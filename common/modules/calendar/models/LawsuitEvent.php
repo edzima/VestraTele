@@ -24,6 +24,9 @@ class LawsuitEvent extends FullCalendarEvent {
 	public function setSession(LawsuitSession $session) {
 		$this->session = $session;
 		$this->setModel($session->lawsuit);
+		if (!empty($session->details)) {
+			$this->tooltipContent = $session->details;
+		}
 		$this->start = $session->date_at;
 		$this->is_canceled = $session->is_cancelled;
 		$this->has_url = !empty($session->url);
