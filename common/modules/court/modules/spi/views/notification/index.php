@@ -12,6 +12,7 @@ use common\widgets\GridView;
 /** @var yii\web\View $this */
 /** @var NotificationSearch $searchModel */
 /** @var yii\data\DataProviderInterface $dataProvider */
+/** @var int $unreadCount */
 
 $this->title = Module::t('notification', 'Notifications');
 $this->params['breadcrumbs'][] = $this->title;
@@ -19,12 +20,26 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="spi-notification-index">
 
+	<?= $unreadCount
+		? Html::a(
+			Module::t('notification', 'Read all'),
+			['read-all', 'appeal' => $searchModel->getAppeal()],
+			[
+				'data-method' => 'post',
+				'class' => 'btn btn-warning pull-right',
+			],
+		)
+		: '' ?>
+
 	<?= AppealsNavWidget::widget([
 		'withUnreadCount' => true,
 		'activeAppeal' => $searchModel->getAppeal(),
 	]) ?>
 
+
+
 	<?= $this->render('_search', ['model' => $searchModel]); ?>
+
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,

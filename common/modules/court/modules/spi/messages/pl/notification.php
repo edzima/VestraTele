@@ -9,4 +9,5 @@ return [
 	'Signature' => 'Sygnatura',
 	'Notifications' => 'Powiadomienia',
 	'Notification: {type}' => 'Powiadomienie: {type}',
+	'Read all' => 'Oznacz wszystkie jako przeczytane',
 ];

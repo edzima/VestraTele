@@ -2,10 +2,12 @@
 
 namespace common\modules\court\modules\spi\controllers;
 
+use common\modules\court\modules\spi\entity\AppealInterface;
 use common\modules\court\modules\spi\entity\search\NotificationSearch;
 use common\modules\court\modules\spi\Module;
 use common\modules\court\modules\spi\repository\NotificationsRepository;
 use Yii;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -16,19 +18,29 @@ class NotificationController extends Controller {
 
 	public bool $readOnView = true;
 	protected NotificationsRepository $repository;
+	public string $defaultAppeal = AppealInterface::APPEAL_WROCLAW;
 
-	public function init(): void {
-		parent::init();
-		$this->repository = $this->module->getRepositoryManager()->getNotifications();
-		$this->repository->setAppeal($this->module->getAppeal());
+	public function behaviors(): array {
+		return [
+			'verbs' => [
+				'class' => VerbFilter::class,
+				'actions' => [
+					'read' => ['POST'],
+					'read-all' => ['POST'],
+				],
+			],
+		];
 	}
 
 	public function actionIndex(string $appeal = null) {
 		if ($appeal === null) {
-			$appeal = $this->module->getAppeal();
+			$appeal = $this->defaultAppeal;
+			if (empty($this->module->appeal)) {
+				$this->module->appeal = $appeal;
+			}
 		}
 		$searchModel = new NotificationSearch(
-			$this->repository,
+			$this->getRepository(),
 			$appeal
 		);
 		$searchModel->read = false;
@@ -43,19 +55,14 @@ class NotificationController extends Controller {
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'unreadCount' => $this->getRepository()->getUnread(),
 		]);
 	}
 
-	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null, string $returnUrl = null) {
-		//@todo Because in Doc API, read action should return NotificationDTO, but return Boolean.
-		$this->repository->setAppeal($appeal);
-		$this->repository->read($id);
-		$url = $returnUrl ?: ['index', 'appeal' => $appeal, 'id' => $id];
-		return $this->redirect($url);
-	}
-
 	public function actionView(int $id, string $appeal, string $signature = null, string $court = null) {
-		$model = $this->repository->findModel($id);
+		$model = $this->getRepository()
+			->setAppeal($appeal)
+			->findModel($id);
 		if ($model === null) {
 			throw new NotFoundHttpException();
 		}
@@ -63,6 +70,28 @@ class NotificationController extends Controller {
 			'model' => $model,
 			'appeal' => $appeal,
 		]);
+	}
+
+	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null, string $returnUrl = null) {
+		//@todo Because in Doc API, read action should return NotificationDTO, but return Boolean.
+		$this->getRepository()
+			->setAppeal($appeal)
+			->read($id);
+		$url = $returnUrl ?: ['index', 'appeal' => $appeal];
+		return $this->redirect($url);
+	}
+
+	public function actionReadAll(string $appeal, string $returnUrl = null) {
+		$this->getRepository()
+			->setAppeal($appeal)
+			->readAll();
+		$this->getRepository()->getUnread(false);
+		$url = $returnUrl ?: ['index', 'appeal' => $appeal];
+		return $this->redirect($url);
+	}
+
+	protected function getRepository(): NotificationsRepository {
+		return $this->module->getRepositoryManager()->getNotifications();
 	}
 
 }

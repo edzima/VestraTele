@@ -92,4 +92,16 @@ class NotificationsRepository extends BaseRepository {
 		return null;
 	}
 
+	public function readAll(): ?bool {
+		$api = $this->getApi();
+		$url = static::route() . '/read/all';
+		$response = $api
+			->get($url);
+
+		if ($response->isOk) {
+			return $response->getData();
+		}
+		return null;
+	}
+
 }
