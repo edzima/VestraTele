@@ -19,7 +19,7 @@ class Module extends BaseModule implements AppealInterface {
 
 	public $controllerNamespace = 'common\modules\court\modules\spi\controllers';
 
-	public string $appeal = AppealInterface::APPEAL_WROCLAW;
+	public ?string $appeal = null;
 
 	public string $appealParamName = 'appeal';
 	public string $userAuthApiPasswordKey;

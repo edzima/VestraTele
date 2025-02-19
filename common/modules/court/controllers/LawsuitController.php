@@ -144,6 +144,7 @@ class LawsuitController extends Controller {
 		if (!$spiModule->isForAppeal($appeal)) {
 			throw new NotFoundHttpException('Invalid Appeal.');
 		}
+		$spiModule->appeal = $appeal;
 		$lawsuit = $spiModule
 			->getRepositoryManager()
 			->getLawsuits()
@@ -245,6 +246,8 @@ class LawsuitController extends Controller {
 					)
 				);
 			} else {
+				$spi = $this->module->getSPI();
+				$spi->appeal = $appeal;
 				$this->view->params['appeal'] = $appeal;
 				if (empty($model->spi_confirmed_user) && !empty($model->spi_last_update_at)) {
 					Flash::add(
@@ -263,7 +266,7 @@ class LawsuitController extends Controller {
 				$lawsuitDetails = $this->findSpiLawsuit($model);
 
 				if ($lawsuitDetails) {
-					$notificationsDataProvider = $this->module->spi
+					$notificationsDataProvider = $spi
 						->getRepositoryManager()
 						->getNotifications()
 						->setAppeal($appeal)
