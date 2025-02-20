@@ -119,7 +119,10 @@ class IssueController extends Controller {
 			$search->problem_status = null;
 			$calculationsDataProvider = $search->search([]);
 		}
-		$summonDataProvider = (new SummonSearch(['issue_id' => $model->id]))->search([]);
+		$summonDataProvider = (new SummonSearch([
+			'issue_id' => $model->id,
+			'user_id' => Yii::$app->user->getId(),
+		]))->search([]);
 		$summonDataProvider->sort = false;
 		$summonDataProvider->pagination = false;
 		Url::remember();
