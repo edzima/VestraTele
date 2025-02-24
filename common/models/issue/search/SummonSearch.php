@@ -184,6 +184,11 @@ class SummonSearch extends Summon implements
 			'start_at' => SORT_DESC,
 		];
 
+		$dataProvider->sort->attributes['customerLastname'] = [
+			'asc' => ['CP.lastname' => SORT_ASC],
+			'desc' => ['CP.lastname' => SORT_DESC],
+		];
+
 		$this->load($params);
 
 		if (!$this->validate()) {
