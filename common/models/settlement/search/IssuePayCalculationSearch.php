@@ -42,6 +42,9 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	public $issue_type_id;
 	public $issue_stage_id;
 
+	public string $fromValue = '';
+	public string $toValue = '';
+
 	/**
 	 * @var int[]|null
 	 */
@@ -69,7 +72,7 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			['issue_stage_id', 'in', 'range' => array_keys(static::getIssueStagesNames()), 'allowArray' => true, 'when' => function (): bool { return $this->withIssueStage; }],
 			['agent_id', 'in', 'range' => array_keys($this->getAgentsNames()), 'allowArray' => true],
 			['problem_status', 'in', 'range' => array_keys(static::getProblemStatusesNames())],
-			[['value'], 'number'],
+			[['value', 'fromValue', 'toValue'], 'number'],
 			['withArchive', 'boolean', 'on' => static::SCENARIO_ARCHIVE],
 			['customerLastname', 'string', 'min' => CustomerSearchInterface::MIN_LENGTH],
 		];
@@ -80,6 +83,8 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 			parent::attributeLabels(),
 			[
 				'withArchive' => Yii::t('common', 'With Archive'),
+				'fromValue' => Yii::t('settlement', 'From Value'),
+				'toValue' => Yii::t('settlement', 'To Value'),
 			]
 		);
 	}
@@ -150,10 +155,10 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 		$this->applyToPayedPaysFilter($query);
 		$this->applyWithoutProvisionsFilter($query);
 		$this->applyExcludesTypesFilter($query);
+		$this->applyValueFilter($query);
 
 		// grid filtering conditions
 		$query->andFilterWhere([
-			IssuePayCalculation::tableName() . '.value' => $this->value,
 			IssuePayCalculation::tableName() . '.type' => $this->type,
 			IssuePayCalculation::tableName() . '.stage_id' => $this->stage_id,
 			IssuePayCalculation::tableName() . '.issue_id' => $this->issue_id,
@@ -277,6 +282,23 @@ class IssuePayCalculationSearch extends IssuePayCalculation implements
 	protected function applyExcludesTypesFilter(IssuePayCalculationQuery $query): void {
 		if (!empty($this->excludesTypes)) {
 			$query->andWhere(['NOT IN', IssuePayCalculation::tableName() . '.type', $this->excludesTypes]);
+		}
+	}
+
+	private function applyValueFilter(IssuePayCalculationQuery $query): void {
+		// grid filtering conditions
+		$query->andFilterWhere([
+			IssuePayCalculation::tableName() . '.value' => $this->value,
+		]);
+		if (!empty($this->fromValue)) {
+			$query->andWhere([
+				'>=', IssuePayCalculation::tableName() . '.value', $this->fromValue,
+			]);
+		}
+		if (!empty($this->toValue)) {
+			$query->andWhere([
+				'<=', IssuePayCalculation::tableName() . '.value', $this->toValue,
+			]);
 		}
 	}
 
