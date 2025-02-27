@@ -543,7 +543,12 @@ use yii\data\DataProviderInterface;
 
 			<?=
 			GridView::widget([
-				'dataProvider' => new ActiveDataProvider(['query' => $model->getIssueModel()->getShipmentsPocztaPolska(),]),
+				'dataProvider' => new ActiveDataProvider([
+					'query' => $model
+						->getIssueModel()
+						->getShipmentsPocztaPolska()
+						->orderBy(['created_at' => SORT_DESC]),
+				]),
 				'showOnEmpty' => false,
 				'summary' => '',
 				'caption' => Yii::t('issue', 'Issue Shipment Poczta Polska'),
