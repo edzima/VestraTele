@@ -78,7 +78,6 @@ return [
 	'You try create calculation as Admin.' => 'Dodajesz rozliczenie jako admin.',
 	'Summons' => 'Wezwania',
 	'VAT (%)' => 'VAT (%)',
-	'VAT' => 'VAT',
 	'Stage on create' => 'Etap w trakcie założenia',
 	'Uncollectible' => 'Nieściągalne',
 	'Uncollectible settlements' => 'Rozliczenia nieściągalne',
@@ -187,4 +186,6 @@ return [
 	'Court expert' => 'Biegły',
 	'Equity' => 'Udział własny',
 	'VAT' => 'VAT',
+	'From Value' => 'Wartość (od)',
+	'To Value' => 'Wartość (do)',
 ];

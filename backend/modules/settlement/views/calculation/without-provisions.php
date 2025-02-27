@@ -4,6 +4,7 @@ use backend\helpers\Html;
 use backend\modules\settlement\models\search\IssuePayCalculationSearch;
 use backend\modules\settlement\widgets\IssuePayCalculationGrid;
 use common\widgets\ActiveForm;
+use kartik\number\NumberControl;
 use yii\data\ActiveDataProvider;
 
 /* @var $this yii\web\View */
@@ -34,6 +35,9 @@ $this->params['breadcrumbs'][] = Yii::t('backend', 'Without provisions');
 		]); ?>
 
 		<div class="row">
+
+			<?= $form->field($searchModel, 'fromValue', ['options' => ['class' => 'col-xs-6 col-md-3 col-lg-2']])->widget(NumberControl::class) ?>
+			<?= $form->field($searchModel, 'toValue', ['options' => ['class' => 'col-xs-6 col-md-4 col-lg-2']])->widget(NumberControl::class) ?>
 			<?= $form->field($searchModel, 'withArchive', ['options' => ['class' => 'col-xs-1']])->checkbox() ?>
 
 		</div>
