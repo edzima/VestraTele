@@ -82,7 +82,9 @@ $this->params['breadcrumbs'][] = $this->title;
 				],
 				'buttons' => [
 					'read' => function ($url, NotificationDTO $model) use ($searchModel): string {
-						return Html::a(Html::icon('check'), $url);
+						return Html::a(Html::icon('check'), $url, [
+							'data-method' => 'POST',
+						]);
 					},
 
 				],

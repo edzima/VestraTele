@@ -17,8 +17,10 @@ class SpiNotificationController extends NotificationController {
 	}
 
 	public function actionRead(string $appeal, int $id, string $signature = null, string $court = null, string $returnUrl = null) {
-		$this->repository->setAppeal($appeal);
-		$this->repository->read($id);
+		$this->getRepository()
+			->setAppeal($appeal)
+			->read($id);
+		$this->getRepository()->setAppeal($appeal);
 		if ($returnUrl) {
 			return $this->redirect($returnUrl);
 		}
