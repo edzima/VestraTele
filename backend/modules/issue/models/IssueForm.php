@@ -161,8 +161,8 @@ class IssueForm extends Model implements LinkedIssuesModel {
 		$this->stage_id = $model->stage_id;
 		$this->archives_nr = $model->archives_nr;
 		$this->signature_act = $model->signature_act;
-		$this->agent_id = $model->agent->id;
-		$this->lawyer_id = $model->lawyer->id;
+		$this->agent_id = $model->agent->id ?? null;
+		$this->lawyer_id = $model->lawyer->id ?? null;
 		$this->tele_id = $model->tele->id ?? null;
 		$this->entity_responsible_id = $model->entity_responsible_id;
 		$this->details = $model->details;

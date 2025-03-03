@@ -13,8 +13,8 @@ class IssueUserForm extends Model {
 
 	protected const UNAVAILABLE_TYPES = [
 		IssueUser::TYPE_CUSTOMER,
-		IssueUser::TYPE_LAWYER,
-		IssueUser::TYPE_AGENT,
+		//	IssueUser::TYPE_LAWYER,
+		//	IssueUser::TYPE_AGENT,
 	];
 
 	public $user_id;

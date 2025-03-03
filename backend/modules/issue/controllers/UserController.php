@@ -151,7 +151,7 @@ class UserController extends Controller {
 	public function actionDelete(int $issueId, int $userId, string $type) {
 		$required = [
 			IssueUser::TYPE_CUSTOMER,
-			IssueUser::TYPE_LAWYER,
+			//	IssueUser::TYPE_LAWYER,
 			IssueUser::TYPE_AGENT,
 		];
 		if (in_array($type, $required, true)) {
